@@ -1,0 +1,14 @@
+# For volume-backed static content: add a Unity Catalog volume resource in the
+# Databricks Apps UI (key: volume) and uncomment the env block below.
+# Otherwise the app serves from the bundled "static/" directory.
+
+command:
+  - uvicorn
+  - app:app
+  - --host
+  - "0.0.0.0"
+
+# Uncomment when using a volume resource for STATIC_CONTENT_PATH:
+# env:
+#   - name: STATIC_CONTENT_PATH
+#     valueFrom: volume
