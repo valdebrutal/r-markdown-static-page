@@ -1,11 +1,13 @@
 # R Markdown asset folders (keep static/index.html committed as placeholder)
 static/*_files/
 
-# R
+# R / renv
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+renv/library
+renv/local
 
 # Python
 __pycache__/
@@ -18,3 +20,5 @@ venv/
 .idea/
 *.swp
 .DS_Store
+
+static/index.html

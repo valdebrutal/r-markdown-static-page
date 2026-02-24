@@ -24,6 +24,13 @@ render_report <- function(out_dir = NULL) {
   if (!file.exists(input_file)) {
     stop("report.Rmd not found. Set working directory to the project root.")
   }
+  if (!rmarkdown::pandoc_available()) {
+    stop(
+      "Pandoc is required by rmarkdown but was not found (or version is below 1.12.3). ",
+      "Install it: macOS: brew install pandoc; Windows: choco install pandoc; ",
+      "Linux: sudo apt install pandoc / sudo yum install pandoc. See https://pandoc.org/installing.html"
+    )
+  }
   rmarkdown::render(
     input = input_file,
     output_file = "index.html",
