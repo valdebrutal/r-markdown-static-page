@@ -76,27 +76,41 @@ Use the **`vending-machine`** CLI profile for your workspace.
 
 **Prerequisites**
 
-- [Databricks CLI](https://docs.databricks.com/en/dev-tools/cli/index.html) installed and a profile named `vending-machine` configured (`databricks configure --profile vending-machine`).
-- App code in a **workspace folder** (e.g. upload this repo or sync it to something like `/Workspace/Users/your@email/rmd-static-dbx-app`).
+- [Databricks CLI](https://docs.databricks.com/en/dev-tools/cli/index.html) installed and a profile configured (e.g. `databricks configure --profile vending-machine`).
+- App code in a **workspace folder**. The deploy command expects a **workspace path** (e.g. `/Workspace/Users/you@company/rmd-static-dbx-app`), not a local path like `.`. Put the code in the workspace first (see below).
 
 **Steps**
 
-1. **Render the report** so `static/` contains `index.html` (otherwise the app has nothing to serve at `/`):
+1. **Render the report** so `static/` contains `index.html`:
    ```bash
    Rscript render_report.R
    ```
-2. **Create the app once** (if it doesn’t exist yet):
+
+2. **Upload the project to the workspace** (pick one):
+   - **Repos:** Clone this repo in Databricks (Repos → Add Repo → your Git URL). Use the repo path as the source (e.g. `/Repos/you@company/rmd-static-dbx-app`).
+   - **CLI:** Create a folder and upload the current directory:
+     ```bash
+     databricks workspace mkdirs /Workspace/Users/your@email/rmd-static-dbx-app --profile vending-machine
+     databricks workspace import_dir . /Workspace/Users/your@email/rmd-static-dbx-app --profile vending-machine
+     ```
+     Replace the path with your workspace path.
+
+3. **Create the app** (once per app name):
    ```bash
    databricks apps create rmd-static-app --profile vending-machine
    ```
-   Use any name that’s unique in the workspace (lowercase letters, numbers, hyphens).
-3. **Point the app at your project folder**  
-   In the Databricks UI: **Apps** → your app → **Settings** → set **Source** to the workspace path that contains `app.py`, `app.yaml`, `requirements.txt`, and `static/`.
-4. **Deploy** (builds, installs deps, runs the app):
+   Use a unique name (lowercase letters, numbers, hyphens). If you see "App with name ... does not exist" when deploying, create the app first with this command.
+
+4. **Deploy** using the **workspace path** as source (not a local path):
    ```bash
-   databricks apps deploy --profile vending-machine
+   databricks apps deploy rmd-static-app --profile vending-machine --source-code-path /Workspace/Users/your@email/rmd-static-dbx-app
    ```
-   If you have multiple apps, specify the app name or ensure the CLI is targeting the right app (e.g. by running from the same context or using the app ID in the command if required by your CLI version).
+   Or, if the app source is already set in the UI, you can run:
+   ```bash
+   databricks apps deploy rmd-static-app --profile vending-machine
+   ```
+
+**Important:** Deploy copies the **contents of your source folder** as-is. The app serves `/` from `static/index.html`, so that file must exist in the source. The repo includes a placeholder `static/index.html` (it is **not** in `.gitignore`). If you previously had `static/index.html` ignored, add and commit it, then re-deploy so the app has something to serve. For the full report, run `Rscript render_report.R` before uploading/deploying (or run it in a workspace notebook and re-deploy).
 
 The deployed app will serve the static page at `/` and the health check at `/api/v1/healthcheck`.
 

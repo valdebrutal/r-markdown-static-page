@@ -20,5 +20,3 @@ venv/
 .idea/
 *.swp
 .DS_Store
-
-static/index.html
